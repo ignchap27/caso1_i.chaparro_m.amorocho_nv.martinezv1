@@ -30,9 +30,11 @@ public class Main {
 		System.out.println("P=" + P);
 		char[] vector = new char[longitud];
 		img.recuperar(vector, longitud);
+		NF = img.alto;
+		NC = img.ancho;
 		System.out.println("NF=" + img.alto);
 		System.out.println("NC=" + img.ancho);
-		longitud = 5069;
+		
 		NR = (longitud * 17) + 16;
 		System.out.println("NR=" + NR);
 		
@@ -71,9 +73,7 @@ public class Main {
 		 
 		 String txtReferencias = "";
 		 
-		 //TODO:ajustar con respecto al número de referencias esperadas -> inicializo por cada posición del caracter
-		
-		
+		 		
 		for(int i=0; i<copyImg.length;i++) { //fila i
 			  for(int j =0; j< copyImg[0].length; j++) { // columna j
 				  for(int k =0; k< copyImg[0][0].length; k++) { //byte k = R,G,B
@@ -126,6 +126,11 @@ public class Main {
             // Crear el objeto FileWriter y BufferedWriter
             FileWriter fileWriter = new FileWriter(filePath);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+			bufferedWriter.write("P="+P+" y longitud= "+longitud+"\n");
+			bufferedWriter.write("NF="+NF+"\n");
+			bufferedWriter.write("NC="+NC+"\n");
+			bufferedWriter.write("NR="+NR+"\n");
+			bufferedWriter.write("NP="+NP+"\n");
             bufferedWriter.write(txtReferencias);
             bufferedWriter.close();
             
@@ -145,7 +150,6 @@ public class Main {
 		 }
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		boolean continuar= true;
 		boolean referencias = false;
 		Main main = new Main();
