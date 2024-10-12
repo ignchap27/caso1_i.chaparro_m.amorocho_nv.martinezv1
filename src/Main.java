@@ -42,32 +42,21 @@ public class Main {
 		
 		System.out.println("NP=" + NP);
 		byte[][][] copyImg = img.imagen.clone();
-		/*
-		byte[][][] copyImg = {{{1,4,7},{1,4,0}},
-							  {{1,4,7},{1,4,1}},
-							  {{1,4,7},{1,4,2}},
-							  {{1,4,7},{1,4,3}},
-							  {{1,4,7},{1,4,4}},
-							  {{1,4,7},{1,4,5}},
-							  {{1,4,7},{1,4,6}}};
 		
-		
-		
-		 * System.out.println("copyImg.length "+copyImg.length);
-		 * System.out.println("copyImg[0].length "+copyImg[0].length);
-		 * System.out.println("copyImg[0][0].length "+copyImg[0][0].length);
-		 */
 		
 		int longitudMensaje = img.leerLongitud(); //en caracteres
-		NP = (16 + (longitudMensaje * 8)) / P;
+		
+		
 		char[] componentes = {'R','G','B'};
 		int desplazamiento, desplazamientoMensaje, pagMensaje, posCaracter;
 		
 		int bytesTotales =0;
-		pagMensaje = NP;
+		pagMensaje = NP-res;
+		/*/
 		if((16 + (longitudMensaje * 8))%P == 0) {
 			pagMensaje--;
 		}
+		/*/
 		
 		int bitsCaracter = 0;
 		
@@ -101,10 +90,8 @@ public class Main {
 							  posCaracter = bitsCaracter/8;
 							  						  
 							  if(bytesTotales != 15) {
-								  desplazamientoMensaje = (((longitudMensaje*8)+16)  + (bitsCaracter/8))%P;
-								  if(desplazamientoMensaje == 0 && bitsCaracter%8 ==0) {
-										pagMensaje++;
-									}
+								  desplazamientoMensaje = ((img.alto * 3 * img.ancho) + (bitsCaracter/8))%P;
+								 
 								  System.out.printf("Mensaje[%d], %d, %d, W \n", posCaracter, pagMensaje, desplazamientoMensaje);
 								  txtReferencias += "Mensaje["+posCaracter+"], "+pagMensaje+", "+desplazamientoMensaje+", W \n";
 								  bitsCaracter++;
@@ -113,13 +100,14 @@ public class Main {
 							  //Si estoy iniciando un caracter primero lo inicializo en 0 en el vector-> el siguiente
 							  if((bytesTotales+1)%8 == 0 &&  bytesTotales+1 != (longitudMensaje*8)+16) {
 								  posCaracter = bitsCaracter/8;
-								  int nextDespl = (((longitudMensaje*8)+16)  + (bitsCaracter/8))%P;
+								  int nextDespl = (((img.alto * 3 * img.ancho) + (bitsCaracter/8))+1)%P;
 								  int nextPg = pagMensaje;
 								  if(nextDespl == 0 && bitsCaracter%8 ==0) {
 									  nextPg++;
 									}
-								  System.out.printf("--Mensaje[%d], %d, %d, W \n", posCaracter, nextPg, nextDespl);
-								  txtReferencias += "--Mensaje["+posCaracter+"], "+nextPg+", "+nextDespl+", W \n";
+								  System.out.printf("--Mensaje[%d], %d, %d, W \n", posCaracter, nextPg, nextDespl-1);
+								  txtReferencias += "--Mensaje["+posCaracter+"], "+nextPg+", "+(nextDespl-1)+", W \n";
+								  pagMensaje = nextPg;
 							  }
 
 						  }
