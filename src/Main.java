@@ -86,7 +86,7 @@ public class Main {
 							  }
 							  
 							//System.out.printf("--Mensaje[%d], %d, %d, W \n", posCaracter, nextPg, nextDespl-1);
-							txtReferencias += "--Mensaje["+posCaracter+"], "+nextPg+", "+nextDespl+", W \n";
+							txtReferencias += "Mensaje["+posCaracter+"],"+nextPg+","+nextDespl+",W\n";
 
 						}
 
@@ -94,7 +94,7 @@ public class Main {
 						desplazamiento = bytesTotales % P;
 						char comp = componentes[k % 3];
 						//System.out.printf("Imagen[%d][%d]%c, %d, %d, R \n", i, j, comp, pagina, desplazamiento);
-						txtReferencias += "Imagen[" + i + "][" + j + "]." + comp + ", " + pagina + ", " + desplazamiento+ ", R \n";
+						txtReferencias += "Imagen[" + i + "][" + j + "]." + comp + "," + pagina + "," + desplazamiento+ ",R\n";
 
 						if(bytesTotales >= 15) {
 							posCaracter = bitsCaracter/8;
@@ -103,7 +103,7 @@ public class Main {
 								desplazamientoMensaje = ((img.alto * 3 * img.ancho) + (bitsCaracter/8))%P;
 							    pagMensaje = ((img.alto * 3 * img.ancho) + (bitsCaracter/8))/P;
 								//System.out.printf("Mensaje[%d], %d, %d, W \n", posCaracter, pagMensaje, desplazamientoMensaje);
-								txtReferencias += "Mensaje["+posCaracter+"], "+pagMensaje+", "+desplazamientoMensaje+", W \n";
+								txtReferencias += "Mensaje["+posCaracter+"],"+pagMensaje+","+desplazamientoMensaje+",W\n";
 								bitsCaracter++;
 							}
 						}
@@ -114,9 +114,6 @@ public class Main {
 				}
 			}
 		}
-
-		System.out.println("Bytes totales: " + bytesTotales);
-		System.out.println("bitsCaracter: " + bitsCaracter);
 
 		try {
 			// Crear el objeto FileWriter y BufferedWriter
