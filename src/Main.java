@@ -146,57 +146,73 @@ public class Main {
         int marcosMaximos = scanner.nextInt();
         scanner.nextLine();
 
-        System.out.println("Nombre del archivo de referencias: src/Referencias/referencias.txt");
-        String archivoReferencias = "src/Referencias/referencias.txt";
+        System.out.println("Nombre del archivo de referencias: src\\Referencias\\referencias.txt");
+        String archivoReferenciasPath = "src\\Referencias\\referencias.txt";
 
         // Leer archivo de referencias
-        List<Integer> referencias = new ArrayList<>();
+        ArchivoReferencias archivoReferencias;
         try {
-            referencias = leerArchivoReferencias(archivoReferencias);
+            archivoReferencias = leerArchivoReferencias(archivoReferenciasPath);
         } catch (IOException e) {
             System.out.println("Error al leer el archivo de referencias");
             e.printStackTrace();
             return;
         }
 
-        // Crear la lista compartida de marcos
-        List<Pagina> marcos = new ArrayList<>(); // Lista de marcos compartida
+		List<Integer> referencias = archivoReferencias.getReferencias();
+		int numReferencias = archivoReferencias.getNumReferencias();
+		int numPaginas = archivoReferencias.getNumPaginas();
 
-        // Crear los hilos y pasar la lista compartida
-        SimuladorPaginacion simulador = new SimuladorPaginacion(marcos, marcosMaximos, referencias);
+        // Lista compartida de marcos
+        List<Pagina> marcos = new ArrayList<>();
+
+        SimuladorPaginacion simulador = new SimuladorPaginacion(marcos, marcosMaximos, referencias, numReferencias, numPaginas);
         AlgoritmoEnvejecimiento envejecimiento = new AlgoritmoEnvejecimiento(marcos);
 
-        // Iniciar los hilos
         simulador.start();
         envejecimiento.start();
 
-        // Esperar que el simulador termine
         try {
             simulador.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        // Detener el hilo de envejecimiento
         envejecimiento.interrupt();
 	}
 
-	private static List<Integer> leerArchivoReferencias(String archivo) throws IOException {
+	private static ArchivoReferencias leerArchivoReferencias(String archivo) throws IOException {
         List<Integer> referencias = new ArrayList<>();
+		int numReferencias = 0;
+		int numPaginas = 0;
+
         try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
             String linea;
+			int numLinea = 1;
             while ((linea = br.readLine()) != null) {
-                String[] partes = linea.split(",");
-                int pagina = Integer.parseInt(partes[1]); // La segunda parte es el número de página
-                referencias.add(pagina);
+				if(numLinea < 4){
+					numLinea++;
+					continue;
+				}else if(numLinea == 4){
+					String[] partes = linea.split("=");
+					numReferencias = Integer.parseInt(partes[1]);
+				}else if(numLinea == 5){
+					String[] partes = linea.split("=");
+					numPaginas = Integer.parseInt(partes[1]);
+				}else{
+					String[] partes = linea.split(",");
+					int pagina = Integer.parseInt(partes[1]); // La segunda parte es el número de página
+					referencias.add(pagina);
+				}
+				numLinea++;
             }
         }
-        return referencias;
+        return new ArchivoReferencias(referencias, numReferencias, numPaginas);
     }
 
 	public static void main(String[] args) {
 		boolean continuar = true;
-		boolean referencias = false;
+		boolean referencias = true;//para realizar prueba esta en true pero deberia esta en false
 		Main main = new Main();
 
 		while (continuar) {

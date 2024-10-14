@@ -15,11 +15,11 @@ class AlgoritmoEnvejecimiento extends Thread {
                     p.incrementarEdad(); // Actualizar la edad de la página
                 }
             }
-            try {
-                Thread.sleep(2); // Corre cada dos milisegundos
-            } catch (InterruptedException e) {
-                break; // Salir del ciclo si es interrumpido
-            }
+            // try {
+            //     Thread.sleep(2); // Corre cada dos milisegundos
+            // } catch (InterruptedException e) {
+            //     break; // Salir del ciclo si es interrumpido
+            // }
         }
     }
 }
