@@ -1,8 +1,12 @@
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -137,9 +141,58 @@ public class Main {
 
 	// Opción 2: Método para calcular número de fallas de página, porcentaje de hits
 	// y tiempos
-	public void calcularFallosYPorcentajeHits() {
-		System.out.println("Fallos y porcentajes");
+	public void calcularFallosYPorcentajeHits(Scanner scanner) {
+		System.out.println("Número de marcos de página: ");
+        int marcosMaximos = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println("Nombre del archivo de referencias: src/Referencias/referencias.txt");
+        String archivoReferencias = "src/Referencias/referencias.txt";
+
+        // Leer archivo de referencias
+        List<Integer> referencias = new ArrayList<>();
+        try {
+            referencias = leerArchivoReferencias(archivoReferencias);
+        } catch (IOException e) {
+            System.out.println("Error al leer el archivo de referencias");
+            e.printStackTrace();
+            return;
+        }
+
+        // Crear la lista compartida de marcos
+        List<Pagina> marcos = new ArrayList<>(); // Lista de marcos compartida
+
+        // Crear los hilos y pasar la lista compartida
+        SimuladorPaginacion simulador = new SimuladorPaginacion(marcos, marcosMaximos, referencias);
+        AlgoritmoEnvejecimiento envejecimiento = new AlgoritmoEnvejecimiento(marcos);
+
+        // Iniciar los hilos
+        simulador.start();
+        envejecimiento.start();
+
+        // Esperar que el simulador termine
+        try {
+            simulador.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Detener el hilo de envejecimiento
+        envejecimiento.interrupt();
 	}
+
+	private static List<Integer> leerArchivoReferencias(String archivo) throws IOException {
+        List<Integer> referencias = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] partes = linea.split(",");
+                int pagina = Integer.parseInt(partes[1]); // La segunda parte es el número de página
+                referencias.add(pagina);
+            }
+        }
+        return referencias;
+    }
 
 	public static void main(String[] args) {
 		boolean continuar = true;
@@ -168,7 +221,7 @@ public class Main {
 				if (!referencias) {
 					System.out.println("Primero debe generar las referencias en la opción 1.");
 				} else {
-					main.calcularFallosYPorcentajeHits();
+					main.calcularFallosYPorcentajeHits(scanner);
 				}
 			}
 
