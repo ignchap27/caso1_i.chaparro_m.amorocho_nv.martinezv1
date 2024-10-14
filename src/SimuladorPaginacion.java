@@ -3,7 +3,7 @@ import java.util.List;
 
 class SimuladorPaginacion extends Thread {
     List<Pagina> marcos;  // La lista es compartida con otros hilos
-    List<Integer> referencias; // Lista de referencias desde el archivo
+    List<Referencia> referencias; // Lista de referencias desde el archivo
     int marcosMaximos;
     int fallas = 0;
     int hits = 0;
@@ -11,30 +11,28 @@ class SimuladorPaginacion extends Thread {
     int totalPaginas;  // Número total de páginas necesarias (NP)
 
     // Constructor que recibe la lista compartida de marcos
-    SimuladorPaginacion(List<Pagina> marcos, int marcosMaximos, List<Integer> referencias, int totalReferencias, int totalPaginas) {
+    SimuladorPaginacion(List<Pagina> marcos, int marcosMaximos, List<Referencia> referencias) {
         this.marcos = marcos; // Referencia compartida
         this.marcosMaximos = marcosMaximos;
         this.referencias = referencias;
-        this.totalReferencias = totalReferencias; // NR del archivo
-        this.totalPaginas = totalPaginas; // NP del archivo
     }
 
     @Override
     public void run() {
-        for (int i = 0; i < totalReferencias; i++) {
-            Integer pagina = referencias.get(i); // Accedemos a cada referencia
+        for (Referencia ref : referencias) {
+            int numeroPagina = ref.numeroPagina;  // Usar el número de página del archivo
 
             synchronized (marcos) {
-                if (!paginaEnMemoria(pagina)) {
-                    fallas++;
-                    reemplazarPagina(pagina);
+                if (!paginaEnMemoria(numeroPagina)) {
+                    fallas++;  // Falla de página
+                    reemplazarPagina(numeroPagina);  // Reemplazar página si es necesario
                 } else {
-                    hits++;
+                    hits++;  // Hit, la página ya estaba en memoria
                 }
             }
 
             // try {
-            //     Thread.sleep(1); // Simulación de acceso cada milisegundo
+            //     Thread.sleep(1);  // Simulación de acceso cada milisegundo
             // } catch (InterruptedException e) {
             //     e.printStackTrace();
             // }

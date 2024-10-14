@@ -150,23 +150,19 @@ public class Main {
         String archivoReferenciasPath = "src\\Referencias\\referencias.txt";
 
         // Leer archivo de referencias
-        ArchivoReferencias archivoReferencias;
+        List<Referencia> referencias;
         try {
-            archivoReferencias = leerArchivoReferencias(archivoReferenciasPath);
+            referencias = leerArchivoReferencias(archivoReferenciasPath);
         } catch (IOException e) {
             System.out.println("Error al leer el archivo de referencias");
             e.printStackTrace();
             return;
         }
 
-		List<Integer> referencias = archivoReferencias.getReferencias();
-		int numReferencias = archivoReferencias.getNumReferencias();
-		int numPaginas = archivoReferencias.getNumPaginas();
-
         // Lista compartida de marcos
         List<Pagina> marcos = new ArrayList<>();
 
-        SimuladorPaginacion simulador = new SimuladorPaginacion(marcos, marcosMaximos, referencias, numReferencias, numPaginas);
+        SimuladorPaginacion simulador = new SimuladorPaginacion(marcos, marcosMaximos, referencias);
         AlgoritmoEnvejecimiento envejecimiento = new AlgoritmoEnvejecimiento(marcos);
 
         simulador.start();
@@ -181,8 +177,8 @@ public class Main {
         envejecimiento.interrupt();
 	}
 
-	private static ArchivoReferencias leerArchivoReferencias(String archivo) throws IOException {
-        List<Integer> referencias = new ArrayList<>();
+	public List<Referencia> leerArchivoReferencias(String archivo) throws IOException {
+        List<Referencia> referencias = new ArrayList<>();
 		int numReferencias = 0;
 		int numPaginas = 0;
 
@@ -201,13 +197,16 @@ public class Main {
 					numPaginas = Integer.parseInt(partes[1]);
 				}else{
 					String[] partes = linea.split(",");
-					int pagina = Integer.parseInt(partes[1]); // La segunda parte es el número de página
-					referencias.add(pagina);
+					String descripcion = partes[0]; // La primera parte es la descripción
+					int numeroPagina = Integer.parseInt(partes[1]); // La segunda parte es el número de página
+					int desplazamiento = Integer.parseInt(partes[2]); // La tercera parte es el desplazamiento
+					char operacion = partes[3].charAt(0); // La cuarta parte es la operación (R o W)
+					referencias.add(new Referencia(descripcion, numeroPagina, desplazamiento, operacion));
 				}
 				numLinea++;
             }
         }
-        return new ArchivoReferencias(referencias, numReferencias, numPaginas);
+        return referencias;
     }
 
 	public static void main(String[] args) {
