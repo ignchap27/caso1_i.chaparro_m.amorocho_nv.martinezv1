@@ -1,8 +1,12 @@
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -137,13 +141,77 @@ public class Main {
 
 	// Opción 2: Método para calcular número de fallas de página, porcentaje de hits
 	// y tiempos
-	public void calcularFallosYPorcentajeHits() {
-		System.out.println("Fallos y porcentajes");
+	public void calcularFallosYPorcentajeHits(Scanner scanner) {
+		System.out.println("Número de marcos de página: ");
+        int marcosMaximos = scanner.nextInt();
+        scanner.nextLine();
+
+        System.out.println("Nombre del archivo de referencias: src\\Referencias\\referencias.txt");
+        String archivoReferenciasPath = "src\\Referencias\\referencias.txt";
+
+        // Leer archivo de referencias
+        List<Referencia> referencias;
+        try {
+            referencias = leerArchivoReferencias(archivoReferenciasPath);
+        } catch (IOException e) {
+            System.out.println("Error al leer el archivo de referencias");
+            e.printStackTrace();
+            return;
+        }
+
+        // Lista compartida de marcos
+        List<Pagina> marcos = new ArrayList<>();
+
+        SimuladorPaginacion simulador = new SimuladorPaginacion(marcos, marcosMaximos, referencias);
+        AlgoritmoEnvejecimiento envejecimiento = new AlgoritmoEnvejecimiento(marcos);
+
+        simulador.start();
+        envejecimiento.start();
+
+        try {
+            simulador.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        envejecimiento.interrupt();
 	}
+
+	public List<Referencia> leerArchivoReferencias(String archivo) throws IOException {
+        List<Referencia> referencias = new ArrayList<>();
+		int numReferencias = 0;
+		int numPaginas = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+            String linea;
+			int numLinea = 1;
+            while ((linea = br.readLine()) != null) {
+				if(numLinea < 4){
+					numLinea++;
+					continue;
+				}else if(numLinea == 4){
+					String[] partes = linea.split("=");
+					numReferencias = Integer.parseInt(partes[1]);
+				}else if(numLinea == 5){
+					String[] partes = linea.split("=");
+					numPaginas = Integer.parseInt(partes[1]);
+				}else{
+					String[] partes = linea.split(",");
+					String descripcion = partes[0]; // La primera parte es la descripción
+					int numeroPagina = Integer.parseInt(partes[1]); // La segunda parte es el número de página
+					int desplazamiento = Integer.parseInt(partes[2]); // La tercera parte es el desplazamiento
+					char operacion = partes[3].charAt(0); // La cuarta parte es la operación (R o W)
+					referencias.add(new Referencia(descripcion, numeroPagina, desplazamiento, operacion));
+				}
+				numLinea++;
+            }
+        }
+        return referencias;
+    }
 
 	public static void main(String[] args) {
 		boolean continuar = true;
-		boolean referencias = false;
+		boolean referencias = true;//para realizar prueba esta en true pero deberia esta en false
 		Main main = new Main();
 
 		while (continuar) {
@@ -168,7 +236,7 @@ public class Main {
 				if (!referencias) {
 					System.out.println("Primero debe generar las referencias en la opción 1.");
 				} else {
-					main.calcularFallosYPorcentajeHits();
+					main.calcularFallosYPorcentajeHits(scanner);
 				}
 			}
 
