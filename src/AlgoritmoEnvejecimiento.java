@@ -12,14 +12,15 @@ class AlgoritmoEnvejecimiento extends Thread {
         while (!Thread.currentThread().isInterrupted()) {
             synchronized (marcos) {
                 for (Pagina p : marcos) {
-                    p.incrementarEdad(); // Actualizar la edad de la página
+                    p.resetearBitReferencia();  // Resetear el bit de referencia
                 }
             }
-            // try {
-            //     Thread.sleep(2); // Corre cada dos milisegundos
-            // } catch (InterruptedException e) {
-            //     break; // Salir del ciclo si es interrumpido
-            // }
+
+            try {
+                Thread.sleep(2);  // Cada 2 milisegundos (ajusta según sea necesario)
+            } catch (InterruptedException e) {
+                break;  // Salir del ciclo si es interrumpido
+            }
         }
     }
 }

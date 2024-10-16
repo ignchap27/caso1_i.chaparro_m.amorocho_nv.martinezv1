@@ -21,9 +21,10 @@ class SimuladorPaginacion extends Thread {
     public void run() {
         for (Referencia ref : referencias) {
             int numeroPagina = ref.numeroPagina;  // Usar el número de página del archivo
+            char tipoOperacion = ref.tipoOperacion;  // Usar el tipo de operación del archivo
 
             synchronized (marcos) {
-                if (!paginaEnMemoria(numeroPagina)) {
+                if (!paginaEnMemoria(numeroPagina, tipoOperacion)) {
                     fallas++;  // Falla de página
                     reemplazarPagina(numeroPagina);  // Reemplazar página si es necesario
                 } else {
@@ -42,11 +43,16 @@ class SimuladorPaginacion extends Thread {
         System.out.println("Hits: " + hits + ", Fallas: " + fallas);
     }
 
-    private boolean paginaEnMemoria(int numeroPagina) {
+    private boolean paginaEnMemoria(int numeroPagina, char tipoOperacion) {
         // Verificación si la página está en memoria
         for (Pagina p : marcos) {
             if (p.numero == numeroPagina) {
                 p.bitR = true; // Página accedida, activar bit de referencia
+
+                if (tipoOperacion == 'W') {
+                    p.bitM = true;
+                }
+
                 return true;
             }
         }
@@ -58,13 +64,22 @@ class SimuladorPaginacion extends Thread {
             if (marcos.size() < marcosMaximos) {
                 marcos.add(new Pagina(numeroPagina)); // Añadir nueva página si hay espacio
             } else {
-                Pagina aReemplazar = marcos.get(0); // Buscar la página con menor "edad"
+                Pagina paginaAReemplazar = null;
+                int claseMinima = 4;  // Inicializar con un valor mayor a cualquier clase posible
+
+                // Buscar la página con la clase NRU más baja
                 for (Pagina p : marcos) {
-                    if (p.edad < aReemplazar.edad) {
-                        aReemplazar = p;
+                    int clase = p.getClaseNRU();
+                    if (clase < claseMinima) {
+                        claseMinima = clase;
+                        paginaAReemplazar = p;
                     }
                 }
-                marcos.remove(aReemplazar); // Reemplazar la página más vieja
+
+                if (paginaAReemplazar != null) {
+                    marcos.remove(paginaAReemplazar);  // Eliminar la página de la memoria
+                }
+                
                 marcos.add(new Pagina(numeroPagina));
             }
         }
